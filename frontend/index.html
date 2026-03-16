@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeSeeker AI — NYC Real Estate</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --color-primary:    #006AFF;
+    --color-accent:     #00B3A4;
+    --color-bg:         #F7F8FC;
+    --color-surface:    #FFFFFF;
+    --color-sidebar-bg: #0A1628;
+    --color-text:       #1A1A2E;
+    --color-muted:      #6B7280;
+    --color-border:     #E5E7EB;
+    --color-active-bg:  #ECFDF5;
+    --color-active-text:#065F46;
+    --color-pending-bg: #FEF3C7;
+    --color-pending-text:#92400E;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  html, body { height: 100%; background: var(--color-bg); color: var(--color-text); }
+
+  /* ── App Shell ── */
+  #app {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--color-sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 20px 24px;
+    gap: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--color-primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .brand-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+  .brand-sub {
+    font-size: 0.72rem;
+    color: #8899BB;
+    letter-spacing: 0.04em;
+  }
+
+  .sidebar-stat {
+    margin: 20px 0 28px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat-number {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--color-accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: #8899BB;
+    margin-top: 3px;
+  }
+
+  .sidebar-section-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #556688;
+    margin-bottom: 10px;
+  }
+
+  .chip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .chip {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #C8D8F0;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    text-align: left;
+    line-height: 1.4;
+  }
+  .chip:hover {
+    background: rgba(0,106,255,0.18);
+    border-color: rgba(0,106,255,0.4);
+    color: #FFFFFF;
+  }
+  .chip::before {
+    content: "→ ";
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 24px;
+    font-size: 0.72rem;
+    color: #445566;
+    line-height: 1.5;
+  }
+
+  /* ── Chat Panel ── */
+  #chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-bg);
+  }
+
+  #chat-header {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .header-info .agent-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .header-info .agent-status {
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    display: inline-block;
+  }
+
+  /* ── Message Thread ── */
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+
+  .message-row {
+    display: flex;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .message-row.user {
+    flex-direction: row-reverse;
+  }
+
+  .msg-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 2px;
+  }
+  .msg-avatar.bot  { background: var(--color-accent); }
+  .msg-avatar.user { background: var(--color-primary); }
+
+  .msg-content { max-width: 680px; display: flex; flex-direction: column; gap: 10px; }
+  .message-row.user .msg-content { align-items: flex-end; }
+
+  .msg-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    padding: 0 4px;
+  }
+
+  .bubble {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 12px 16px;
+    font-size: 0.93rem;
+    line-height: 1.55;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid var(--color-border);
+    word-break: break-word;
+  }
+  .message-row.user .bubble {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  /* ── Typing Indicator ── */
+  #typing-indicator .bubble {
+    padding: 14px 18px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-muted);
+    animation: bounce 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30%            { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* ── Property Cards ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 760px;
+  }
+
+  .property-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: box-shadow 0.15s;
+  }
+  .property-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .card-price {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+  .badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-active  { background: var(--color-active-bg);  color: var(--color-active-text); }
+  .badge-pending { background: var(--color-pending-bg); color: var(--color-pending-text); }
+  .badge-default { background: #F3F4F6; color: #374151; }
+
+  .card-address { font-size: 0.85rem; }
+  .card-street  { font-weight: 700; }
+  .card-city    { color: var(--color-muted); font-size: 0.78rem; margin-top: 1px; }
+
+  .pills-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pill {
+    background: #EEF4FF;
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  .card-meta {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+
+  .card-link {
+    margin-top: 2px;
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .card-link:hover { text-decoration: underline; }
+
+  /* ── Farewell Button ── */
+  .farewell-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-new-chat {
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn-new-chat:hover { opacity: 0.85; }
+
+  /* ── Input Bar ── */
+  #input-bar {
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+    padding: 14px 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  #user-input {
+    flex: 1;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.93rem;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    max-height: 120px;
+    line-height: 1.5;
+    background: var(--color-bg);
+    transition: border-color 0.15s;
+    overflow-y: auto;
+  }
+  #user-input:focus { border-color: var(--color-primary); }
+  #user-input:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  #send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: none;
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  #send-btn:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
+  #send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── Toast Error ── */
+  #toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1A1A2E;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+
+  /* ── Mobile ── */
+  @media (max-width: 640px) {
+    #sidebar { display: none; }
+    #messages { padding: 16px; }
+    #input-bar { padding: 10px 14px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">🏠</div>
+      <div>
+        <div class="brand-name">HomeSeeker AI</div>
+        <div class="brand-sub">Powered by Amazon Nova</div>
+      </div>
+    </div>
+
+    <div class="sidebar-stat">
+      <div class="stat-number">217</div>
+      <div class="stat-label">NYC Listings Available</div>
+    </div>
+
+    <div class="sidebar-section-label">Try asking</div>
+    <div class="chip-list">
+      <button class="chip" data-prompt="2-bedroom condos in Brooklyn under $600k">2-bedroom condos in Brooklyn under $600k</button>
+      <button class="chip" data-prompt="Single family homes in Staten Island">Single family homes in Staten Island</button>
+      <button class="chip" data-prompt="Multi-family homes in the Bronx under $1.2M">Multi-family homes in the Bronx under $1.2M</button>
+    </div>
+
+    <div class="sidebar-footer">
+      NYC real estate data · 217 listings<br>Brooklyn · Manhattan · Bronx · Queens · Staten Island
+    </div>
+  </aside>
+
+  <!-- Chat Panel -->
+  <main id="chat-panel">
+    <div id="chat-header">
+      <div class="header-avatar">A</div>
+      <div class="header-info">
+        <div class="agent-name">Alex · HomeSeeker AI</div>
+        <div class="agent-status"><span class="status-dot"></span> Online</div>
+      </div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div id="input-bar">
+      <textarea id="user-input" rows="1" placeholder="Describe your ideal home…"></textarea>
+      <button id="send-btn" title="Send">&#10148;</button>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const state = {
+    sessionId: null,
+    isLoading: false,
+    isFarewellShown: false,
+  };
+
+  const messagesEl  = document.getElementById('messages');
+  const inputEl     = document.getElementById('user-input');
+  const sendBtn     = document.getElementById('send-btn');
+  const toastEl     = document.getElementById('toast');
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatReply(text) {
+    // Strip markdown before escaping so asterisks never reach the DOM
+    text = text
+      .replace(/\*\*(.+?)\*\*/g, '$1')   // **bold**
+      .replace(/\*(.+?)\*/g, '$1')        // *italic*
+      .replace(/^#{1,6}\s+/gm, '')        // # headings
+      .replace(/^\s*[-*]\s+/gm, '')       // bullet points
+      .replace(/^\s*\d+\.\s+/gm, '')      // numbered lists
+      .replace(/\[(.+?)\]\(.+?\)/g, '$1') // [link](url) → text only
+      .replace(/`(.+?)`/g, '$1');         // `code`
+    return escapeHtml(text).replace(/\n+/g, '<br>');
+  }
+
+  function formatPrice(price) {
+    if (price == null) return null;
+    return '$' + Number(price).toLocaleString('en-US');
+  }
+
+  function scrollToBottom() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showError(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 4000);
+  }
+
+  // ── Typing Indicator ─────────────────────────────────────────────────────
+
+  function showTypingIndicator() {
+    const row = document.createElement('div');
+    row.id = 'typing-indicator';
+    row.className = 'message-row bot';
+    row.innerHTML = `
+      <div class="msg-avatar bot">A</div>
+      <div class="msg-content">
+        <div class="bubble">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+      </div>`;
+    messagesEl.appendChild(row);
+    scrollToBottom();
+  }
+
+  function removeTypingIndicator() {
+    const el = document.getElementById('typing-indicator');
+    if (el) el.remove();
+  }
+
+  // ── Property Card ─────────────────────────────────────────────────────────
+
+  function renderCard(p) {
+    const price   = formatPrice(p.price);
+    const status  = p.listing_status;
+    let badgeClass = 'badge-default';
+    if (status) {
+      const s = status.toLowerCase();
+      if (s === 'active')  badgeClass = 'badge-active';
+      else if (s === 'pending') badgeClass = 'badge-pending';
+    }
+
+    // Pills
+    const pills = [];
+    if (p.beds  != null) pills.push(`${escapeHtml(p.beds)} bd`);
+    if (p.baths != null) pills.push(`${escapeHtml(p.baths)} ba`);
+    if (p.sqft  != null) pills.push(`${Number(p.sqft).toLocaleString()} sqft`);
+    const pillsHtml = pills.length
+      ? `<div class="pills-row">${pills.map(t => `<span class="pill">${t}</span>`).join('')}</div>`
+      : '';
+
+    // Meta line
+    const metaParts = [];
+    if (p.property_type) metaParts.push(escapeHtml(p.property_type));
+    if (p.year_built)    metaParts.push(`Built ${escapeHtml(p.year_built)}`);
+    const metaHtml = metaParts.length
+      ? `<div class="card-meta">${metaParts.join(' · ')}</div>`
+      : '';
+
+    // Location
+    const cityLine = [p.city, p.neighborhood].filter(Boolean).map(escapeHtml).join(' • ');
+
+    return `
+      <div class="property-card">
+        <div class="card-header">
+          ${price ? `<div class="card-price">${price}</div>` : '<div></div>'}
+          ${status ? `<span class="badge ${badgeClass}">${escapeHtml(status)}</span>` : ''}
+        </div>
+        ${p.address ? `
+          <div class="card-address">
+            <div class="card-street">${escapeHtml(p.address)}</div>
+            ${cityLine ? `<div class="card-city">${cityLine}</div>` : ''}
+          </div>` : ''}
+        ${pillsHtml}
+        ${metaHtml}
+        ${p.url ? `<a class="card-link" href="${escapeHtml(p.url)}" target="_blank" rel="noopener">View on Redfin ↗</a>` : ''}
+      </div>`;
+  }
+
+  // ── Message Rendering ─────────────────────────────────────────────────────
+
+  function appendUserBubble(text) {
+    const row = document.createElement('div');
+    row.className = 'message-row user';
+    row.innerHTML = `
+      <div class="msg-avatar user">Y</div>
+      <div class="msg-content">
+        <div class="msg-label">You</div>
+        <div class="bubble">${escapeHtml(text)}</div>
+      </div>`;
+    messagesEl.appendChild(row);
+    scrollToBottom();
+  }
+
+  function appendBotMessage(reply, properties, isFarewell) {
+    const row = document.createElement('div');
+    row.className = 'message-row bot';
+
+    const cardsHtml = (properties && properties.length > 0)
+      ? `<div class="cards-grid">${properties.map(renderCard).join('')}</div>`
+      : '';
+
+    let farewellHtml = '';
+    if (isFarewell && !state.isFarewellShown) {
+      state.isFarewellShown = true;
+      farewellHtml = `
+        <div class="farewell-block">
+          <button class="btn-new-chat" onclick="startNewChat()">Start New Chat</button>
+        </div>`;
+    }
+
+    row.innerHTML = `
+      <div class="msg-avatar bot">A</div>
+      <div class="msg-content">
+        <div class="msg-label">Alex</div>
+        <div class="bubble">${formatReply(reply)}</div>
+        ${cardsHtml}
+        ${farewellHtml}
+      </div>`;
+
+    messagesEl.appendChild(row);
+
+    if (isFarewell) {
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+    }
+
+    scrollToBottom();
+  }
+
+  // ── Send ──────────────────────────────────────────────────────────────────
+
+  async function handleSend() {
+    const text = inputEl.value.trim();
+    if (!text || state.isLoading || !state.sessionId) return;
+
+    state.isLoading = true;
+    inputEl.value = '';
+    autoResizeTextarea();
+    sendBtn.disabled = true;
+
+    appendUserBubble(text);
+    showTypingIndicator();
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: state.sessionId, message: text }),
+      });
+
+      removeTypingIndicator();
+
+      if (!res.ok) {
+        throw new Error(`Server error ${res.status}`);
+      }
+
+      const data = await res.json();
+      appendBotMessage(data.reply, data.properties, data.is_farewell);
+    } catch (err) {
+      removeTypingIndicator();
+      showError('Something went wrong. Please try again.');
+      console.error(err);
+    } finally {
+      state.isLoading = false;
+      if (!state.isFarewellShown) {
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    }
+  }
+
+  // ── Session Init ──────────────────────────────────────────────────────────
+
+  async function init() {
+    // Reuse existing session or create new one
+    let sessionId = localStorage.getItem('hs_session_id');
+
+    if (!sessionId) {
+      try {
+        const res = await fetch('/api/session/new');
+        if (!res.ok) throw new Error('Session init failed');
+        const data = await res.json();
+        sessionId = data.session_id;
+        localStorage.setItem('hs_session_id', sessionId);
+      } catch (err) {
+        showError('Could not connect to server.');
+        console.error(err);
+        return;
+      }
+    }
+
+    state.sessionId = sessionId;
+
+    // Greeting message
+    appendBotMessage(
+      "Hi! I'm Alex, your HomeSeeker AI assistant. I have access to 217 NYC property listings across Brooklyn, Manhattan, the Bronx, Queens, and Staten Island.\n\nTell me what you're looking for — bedrooms, budget, neighborhood, property type — and I'll find the best matches for you.",
+      [],
+      false
+    );
+    inputEl.focus();
+  }
+
+  // ── Misc ──────────────────────────────────────────────────────────────────
+
+  function startNewChat() {
+    localStorage.removeItem('hs_session_id');
+    location.reload();
+  }
+
+  function autoResizeTextarea() {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+  }
+
+  // ── Event Listeners ───────────────────────────────────────────────────────
+
+  sendBtn.addEventListener('click', handleSend);
+
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  });
+
+  inputEl.addEventListener('input', autoResizeTextarea);
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const prompt = chip.dataset.prompt;
+      inputEl.value = prompt;
+      autoResizeTextarea();
+      handleSend();
+    });
+  });
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>

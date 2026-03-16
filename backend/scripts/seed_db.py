@@ -57,12 +57,17 @@ async def seed():
         await conn.execute(text("TRUNCATE TABLE properties RESTART IDENTITY"))
 
     rows = []
+    seen_addresses: set = set()
     with open(DATA_FILE, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for raw in reader:
             row = {db_col: _coerce(db_col, raw[csv_col])
                    for csv_col, db_col in COL_MAP.items()
                    if csv_col in raw}
+            addr = row.get("address") or ""
+            if addr in seen_addresses:
+                continue
+            seen_addresses.add(addr)
             rows.append(row)
 
     batch_size = 500

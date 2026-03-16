@@ -61,7 +61,7 @@ async def search_properties(
     if filters:
         main_q = main_q.where(*filters)
     main_q = main_q.order_by(Property.price.asc()).limit(limit)
-    rows = (await db.execute(main_q)).scalars().all()
+    rows = (await db.execute(main_q)).unique().scalars().all()
 
     applied = {
         k: v for k, v in {

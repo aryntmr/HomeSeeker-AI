@@ -7,8 +7,14 @@ from backend.config import settings
 from backend.session_store import session_store
 from backend.tools.property_search import search_properties
 
-SYSTEM_PROMPT = """You are Alex, a friendly NYC real estate agent helping buyers find homes from a database of 2170 NYC listings.
+SYSTEM_PROMPT = """You are Alex, a friendly NYC real estate agent helping buyers find homes from a database of 217 NYC listings.
 Gather requirements conversationally and call search_properties as soon as you have at least one criterion.
+
+CRITICAL FORMATTING RULES:
+- Plain text only. Zero markdown. No asterisks, no bold (**), no bullets, no numbered lists, no headers, no backticks.
+- Never list or describe individual properties in your reply text. The UI displays property cards automatically.
+- After a search, write ONE short sentence summarizing what you found (e.g. "I found 4 condos in Brooklyn under $600k — take a look!"), then stop.
+- Keep every reply under 3 sentences.
 
 Tool: search_properties — searches the property database; all filters are optional, combine any subset.
 - min_price (int): minimum listing price in dollars
@@ -111,7 +117,9 @@ FLOAT_PARAMS = {"min_baths"}
 
 
 def _strip_thinking(text: str) -> str:
-    return re.sub(r"<thinking>.*?</thinking>", "", text, flags=re.DOTALL).strip()
+    text = re.sub(r"<thinking>.*?</thinking>", "", text, flags=re.DOTALL)
+    text = re.sub(r"</?response>", "", text)
+    return text.strip()
 
 
 def _coerce_tool_input(raw: dict) -> dict:
@@ -127,11 +135,11 @@ def _coerce_tool_input(raw: dict) -> dict:
 
 
 def _trim_tool_result(result: dict) -> dict:
-    """Keep only total_found + top 3 properties to avoid context bloat in history."""
+    """Keep only total_found + top 5 properties to avoid context bloat in history."""
     return {
         "total_found": result["total_found"],
         "search_criteria": result.get("search_criteria", {}),
-        "properties": result["properties"][:3],
+        "properties": result["properties"][:5],
     }
 
 
@@ -199,14 +207,13 @@ class ChatAgent:
                     _log(f"[tool]  input  → {tool_input}")
 
                     search_result = await search_properties(db, **tool_input)
-                    full_properties = search_result["properties"]
+                    trimmed = _trim_tool_result(search_result)
+                    full_properties = trimmed["properties"]
 
                     _log(f"[tool]  result → total_found={search_result['total_found']}, returned={len(full_properties)}")
                     if full_properties:
                         p = full_properties[0]
                         _log(f"[tool]  top result: {p.get('address')}, {p.get('city')} — ${p.get('price'):,}")
-
-                    trimmed = _trim_tool_result(search_result)
                     tool_results.append({
                         "toolUseId": tool_use_id,
                         "content": [{"json": trimmed}],
