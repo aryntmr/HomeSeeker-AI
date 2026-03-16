@@ -2,7 +2,7 @@
 
 ## Overall Progress
 - [x] Phase 1: Scaffold + Data Layer
-- [ ] Phase 2: Property Search Tool
+- [x] Phase 2: Property Search Tool
 - [ ] Phase 3: Nova 2 Lite Chat Agent
 - [ ] Phase 4: FastAPI + Text Endpoints
 - [ ] Phase 5: Nova 2 Sonic Voice Layer
@@ -22,12 +22,12 @@
 - [x] Create local PostgreSQL `homeseeker` database
 - [x] Seeded 2170 properties, verified with psql queries
 
-## Phase 2 — Property Search Tool
-- [ ] `tools/property_search.py`
-- [ ] All optional filter params with dynamic WHERE clauses
-- [ ] ILIKE for location and property_type
-- [ ] count() + limit query pattern
-- [ ] Verify correct results returned for sample queries
+## Phase 2 — Property Search Tool ✅
+- [x] `tools/property_search.py`
+- [x] All optional filter params with dynamic WHERE clauses
+- [x] ILIKE for location and property_type
+- [x] count() + limit query pattern
+- [x] Verify correct results returned for sample queries (42/42 tests passed)
 
 ## Phase 3 — Nova 2 Lite Chat Agent
 - [ ] `session_store.py` (in-memory history store)
