@@ -1,0 +1,30 @@
+TOOLS AND TECHNOLOGIES
+
+Learn about Amazon Nova on our website and announcement blog
+
+Amazon Nova Code Examples
+
+Amazon Nova developer blog Nova 2 Lite, Nova 2 Sonic, Nova Act.
+
+Amazon Nova re:Invent sessions:
+- Nova 2 Lite
+- Nova 2 Sonic
+- Nova Act
+
+Amazon Nova workshops:
+- Amazon Nova 2 Sonic
+- Amazon Nova foundation models
+- Amazon Nova Act
+
+From the blog:
+- Accelerate AI development with Amazon Bedrock API keys
+- Build real-time conversational AI experiences using Amazon Nova Sonic and LiveKit
+- Benchmarking Amazon Nova: A comprehensive analysis through MT-Bench and Arena-Hard-Auto
+- Amazon Nova Act - Useful, reliable agents from prototype to production
+
+
+IMPORTANT NOTES
+
+THERE ARE NO MORE CREDITS AVAILABLE
+THERE ARE NO MORE STUDENT SANDBOXES AVAILABLE.
+Must use own AWS account/credentials.

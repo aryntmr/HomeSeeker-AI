@@ -56,7 +56,6 @@ backend/
   scripts/
     seed_db.py           # CSV → PostgreSQL (2170 rows, idempotent)
 frontend/                # Phase 6
-test_phase3.py           # Phase 3 smoke test (multi-turn, verbose mode)
 ```
 
 ---
@@ -105,8 +104,3 @@ uvicorn backend.main:app --reload --port 8000
 - `DATABASE_URL` — `postgresql+asyncpg://aryan@localhost/homeseeker`
 - `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
 
-**Test Phase 3 agent**:
-```bash
-python -m test_phase3   # VERBOSE=True in script to see loop trace
-```
-Sends 3 messages in one session; verifies tool dispatch, multi-turn history, and property results.

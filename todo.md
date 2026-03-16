@@ -37,7 +37,7 @@
 - [x] Agentic tool-use loop
 - [x] String-to-number coercion on tool inputs
 - [x] History trimming after tool results
-- [x] Verify end-to-end via test_phase3.py (multi-turn, verbose, tool dispatch confirmed)
+- [x] Verify end-to-end (multi-turn, verbose, tool dispatch confirmed)
 
 ## Phase 4 — FastAPI + Text Endpoints
 - [ ] `models/schemas.py` (ChatRequest, ChatResponse)
