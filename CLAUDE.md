@@ -27,7 +27,7 @@ Real estate chatbot — natural conversation → search 2170 NYC property listin
 | 1 | Scaffold + Data Layer | ✅ Done |
 | 2 | Property Search Tool | ✅ Done |
 | 3 | Nova 2 Lite Chat Agent | ✅ Done |
-| 4 | FastAPI + Text Endpoints | ⬜ |
+| 4 | FastAPI + Text Endpoints | ✅ Done |
 | 5 | Nova 2 Sonic Voice Layer | ⬜ |
 | 6 | Frontend | ⬜ |
 
@@ -44,15 +44,17 @@ Full details in [`implementation_plan.md`](implementation_plan.md). Track tasks 
 backend/
   config.py              # Settings via pydantic-settings (.env)
   database.py            # Async engine, AsyncSessionLocal, get_db()
-  main.py                # FastAPI app, lifespan, StaticFiles
-  session_store.py       # In-memory session history store ✅
+  main.py                # FastAPI app, lifespan, routers, StaticFiles
+  session_store.py       # In-memory session history store
   models/
     property.py          # Property ORM (19 cols)
+    schemas.py           # ChatRequest / ChatResponse Pydantic models
   tools/
-    property_search.py   # search_properties() — 11 filters ✅
+    property_search.py   # search_properties() — 11 filters
   agents/
-    chat_agent.py        # Nova 2 Lite agentic loop ✅
-  routers/               # Phase 4
+    chat_agent.py        # Nova 2 Lite agentic loop
+  routers/
+    chat.py              # POST /api/chat, GET /api/session/new
   scripts/
     seed_db.py           # CSV → PostgreSQL (2170 rows, idempotent)
 frontend/                # Phase 6
@@ -60,7 +62,7 @@ frontend/                # Phase 6
 
 ---
 
-## What's Built (Phases 1–3)
+## What's Built (Phases 1–4)
 
 **Phase 1 — Data Layer**
 - `Property` ORM: 19 cols — price, beds, baths, sqft, address, city, state, neighborhood, property_type, year_built, listing_status, lat/lon, url, zip_code, lot_size, days_on_market, hoa_month
@@ -74,14 +76,16 @@ frontend/                # Phase 6
 - Returns `{total_found, properties: [...], search_criteria: {...}}`
 
 **Phase 3 — Nova 2 Lite Chat Agent**
-- `session_store.py` — `SessionStore`: `get_or_create`, `append_message`, `get_history`, `delete`, `cleanup_expired` (TTL-based); module-level singleton
-- `agents/chat_agent.py` — `ChatAgent.chat(session_id, message, db, verbose=False) -> (str, list)`:
-  - Alex persona system prompt with tool definition + DB schema inline
-  - Full `toolSpec` for all 11 `search_properties` params
+- `session_store.py` — TTL-based in-memory history store; module-level singleton
+- `agents/chat_agent.py` — `ChatAgent.chat(session_id, message, db) -> (str, list)`:
+  - Alex persona system prompt with full `toolSpec` for all 11 params
   - Agentic loop: `converse()` → `tool_use` → coerce inputs → `search_properties` → trim to top 3 in history → loop → `end_turn`
-  - `<thinking>` tag stripping from replies
-  - `verbose=True` prints each loop iteration, tool inputs, and tool results
-  - Module-level `chat_agent` singleton
+  - `<thinking>` tag stripping; module-level `chat_agent` singleton
+
+**Phase 4 — FastAPI + Text Endpoints**
+- `models/schemas.py` — `ChatRequest(session_id, message)`, `ChatResponse(session_id, reply, properties, is_farewell)`
+- `routers/chat.py` — `GET /api/session/new` (returns UUID), `POST /api/chat` (calls agent, detects farewell)
+- `main.py` — includes chat router; StaticFiles mounted last on `/`
 
 ---
 

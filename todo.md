@@ -4,7 +4,7 @@
 - [x] Phase 1: Scaffold + Data Layer
 - [x] Phase 2: Property Search Tool
 - [x] Phase 3: Nova 2 Lite Chat Agent
-- [ ] Phase 4: FastAPI + Text Endpoints
+- [x] Phase 4: FastAPI + Text Endpoints
 - [ ] Phase 5: Nova 2 Sonic Voice Layer
 - [ ] Phase 6: Frontend
 
@@ -39,11 +39,11 @@
 - [x] History trimming after tool results
 - [x] Verify end-to-end (multi-turn, verbose, tool dispatch confirmed)
 
-## Phase 4 — FastAPI + Text Endpoints
-- [ ] `models/schemas.py` (ChatRequest, ChatResponse)
-- [ ] `routers/chat.py` (POST /api/chat, GET /api/session/new)
-- [ ] Complete `main.py` (routers + StaticFiles)
-- [ ] End-to-end text chat test in browser
+## Phase 4 — FastAPI + Text Endpoints ✅
+- [x] `models/schemas.py` (ChatRequest, ChatResponse)
+- [x] `routers/chat.py` (POST /api/chat, GET /api/session/new)
+- [x] Complete `main.py` (routers + StaticFiles)
+- [x] End-to-end text chat test in browser
 
 ## Phase 5 — Nova 2 Sonic Voice Layer
 - [ ] `agents/voice_agent.py` (VoiceSession + event builders)

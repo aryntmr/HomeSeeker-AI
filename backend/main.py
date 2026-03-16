@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from backend.database import engine, Base
+from backend.routers.chat import router as chat_router
 
 
 @asynccontextmanager
@@ -16,6 +17,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="HomeSeeker AI", lifespan=lifespan)
 
-# Routers added in Phase 4
+app.include_router(chat_router)
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
