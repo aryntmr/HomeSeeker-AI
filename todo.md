@@ -3,7 +3,7 @@
 ## Overall Progress
 - [x] Phase 1: Scaffold + Data Layer
 - [x] Phase 2: Property Search Tool
-- [ ] Phase 3: Nova 2 Lite Chat Agent
+- [x] Phase 3: Nova 2 Lite Chat Agent
 - [ ] Phase 4: FastAPI + Text Endpoints
 - [ ] Phase 5: Nova 2 Sonic Voice Layer
 - [ ] Phase 6: Frontend
@@ -29,15 +29,15 @@
 - [x] count() + limit query pattern
 - [x] Verify correct results returned for sample queries (42/42 tests passed)
 
-## Phase 3 — Nova 2 Lite Chat Agent
-- [ ] `session_store.py` (in-memory history store)
-- [ ] `agents/chat_agent.py`
-- [ ] System prompt (Alex persona)
-- [ ] toolSpec JSON for search_properties
-- [ ] Agentic tool-use loop
-- [ ] String-to-number coercion on tool inputs
-- [ ] History trimming after tool results
-- [ ] Verify end-to-end via curl
+## Phase 3 — Nova 2 Lite Chat Agent ✅
+- [x] `session_store.py` (in-memory history store)
+- [x] `agents/chat_agent.py`
+- [x] System prompt (Alex persona)
+- [x] toolSpec JSON for search_properties
+- [x] Agentic tool-use loop
+- [x] String-to-number coercion on tool inputs
+- [x] History trimming after tool results
+- [x] Verify end-to-end via test_phase3.py (multi-turn, verbose, tool dispatch confirmed)
 
 ## Phase 4 — FastAPI + Text Endpoints
 - [ ] `models/schemas.py` (ChatRequest, ChatResponse)
