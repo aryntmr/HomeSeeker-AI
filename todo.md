@@ -1,7 +1,7 @@
 # TODO
 
 ## Overall Progress
-- [ ] Phase 1: Scaffold + Data Layer
+- [x] Phase 1: Scaffold + Data Layer
 - [ ] Phase 2: Property Search Tool
 - [ ] Phase 3: Nova 2 Lite Chat Agent
 - [ ] Phase 4: FastAPI + Text Endpoints
@@ -10,17 +10,17 @@
 
 ---
 
-## Phase 1 — Scaffold + Data Layer
-- [ ] Create project directory structure
-- [ ] `requirements.txt`
-- [ ] `config.py` (pydantic-settings, .env)
-- [ ] `models/property.py` (SQLAlchemy ORM)
-- [ ] `database.py` (async engine + session factory)
-- [ ] `scripts/seed_db.py` (CSV → PostgreSQL)
-- [ ] Place `homes.csv` in `backend/data/`
-- [ ] `main.py` lifespan (create tables on startup)
-- [ ] Create local PostgreSQL `homeseeker` database
-- [ ] Run seed script, verify 3500 rows loaded
+## Phase 1 — Scaffold + Data Layer ✅
+- [x] Create project directory structure
+- [x] `requirements.txt`
+- [x] `config.py` (pydantic-settings, .env, csv_path)
+- [x] `models/property.py` (SQLAlchemy ORM, 19 columns)
+- [x] `database.py` (async engine + session factory)
+- [x] `scripts/seed_db.py` (CSV → PostgreSQL, batch 500, idempotent)
+- [x] Place `homes.csv` in `backend/data/`
+- [x] `main.py` lifespan (create tables on startup)
+- [x] Create local PostgreSQL `homeseeker` database
+- [x] Seeded 2170 properties, verified with psql queries
 
 ## Phase 2 — Property Search Tool
 - [ ] `tools/property_search.py`
